@@ -1,5 +1,7 @@
 import 'package:bloc_practice/bloc/counter_event.dart';
 import 'package:bloc_practice/bloc/counter_state.dart';
+import 'package:bloc_practice/visibility_bloc.dart/bloc/visibility_event.dart';
+import 'package:bloc_practice/visibility_bloc.dart/bloc/visibility_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // here we are creating a CounterBloc class that extends the Bloc class from the flutter_bloc package.
@@ -11,14 +13,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 // The CounterBloc class is used to manage the state of the counter in the application.
 // The CounterBloc class listens to the CounterIncrementEvent event and updates the count of the state accordingly.
 
-class CounterBloc extends Bloc<CounterEvent, CounterState> {
-  CounterBloc() : super(CounterState(count: 0)) {
-    on<CounterIncrementEvent>((event, emit) {
-      emit(CounterState(count: state.count + 1));
+class VisibilityBloc extends Bloc<VisibilityEvent, VisibilityState> {
+  VisibilityBloc() : super(VisibilityState(show: true)) {
+    on<VisibilityShowEvent>((event, emit) {
+      emit(VisibilityState(show: true));
     });
 
-    on<CounterDecrementEvent>(
-        (event, emit) => emit(CounterState(count: state.count - 1)));
+    on<VisibilityHideEvent>(
+        (event, emit) => emit(VisibilityState(show: false)));
   }
 }
-  

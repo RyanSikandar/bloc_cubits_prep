@@ -1,6 +1,9 @@
 import 'package:bloc_practice/bloc/counter_bloc.dart';
 import 'package:bloc_practice/bloc/counter_event.dart';
 import 'package:bloc_practice/bloc/counter_state.dart';
+import 'package:bloc_practice/visibility_bloc.dart/bloc/visibility_bloc.dart';
+import 'package:bloc_practice/visibility_bloc.dart/bloc/visibility_event.dart';
+import 'package:bloc_practice/visibility_bloc.dart/bloc/visibility_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,28 +18,37 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          // This is the theme of your application.
+          //
+          // TRY THIS: Try running your application with "flutter run". You'll see
+          // the application has a purple toolbar. Then, without quitting the app,
+          // try changing the seedColor in the colorScheme below to Colors.green
+          // and then invoke "hot reload" (save your changes or press the "hot
+          // reload" button in a Flutter-supported IDE, or press "r" if you used
+          // the command line to start the app).
+          //
+          // Notice that the counter didn't reset back to zero; the application
+          // state is not lost during the reload. To reset the state, use hot
+          // restart instead.
+          //
+          // This works for code too, not just values: Most code changes can be
+          // tested with just a hot reload.
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<CounterBloc>(
+              create: (context) => CounterBloc(),
+            ),
+            BlocProvider<VisibilityBloc>(
+              create: (context) => VisibilityBloc(),
+            ),
+          ],
+          child: const MyHomePage(title: 'Flutter Demo Home Page'),
+        ));
   }
 }
 
@@ -59,8 +71,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final counterBloc = CounterBloc();
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -102,22 +112,61 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             BlocBuilder<CounterBloc, CounterState>(
-                bloc: counterBloc,
+                buildWhen: (previous, current) {
+              print('previous: ${previous.count}');
+              print('current: ${current.count}');
+              return previous.count != current.count;
+            }, //Optional if you want to use the default counterBloc otherwise you can use BlocProvider.of<CounterBloc>(context). using this is of local scope.
                 builder: (context, state) {
-                  return Text(
-                    state.count.toString(),
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  );
-                })
+              return Text(
+                state.count.toString(),
+                style: Theme.of(context).textTheme.headlineMedium,
+              );
+            }),
+            BlocBuilder<VisibilityBloc, VisibilityState>(
+                builder: (context, state) {
+              return Visibility(
+                visible: state.show,
+                child: Container(
+                  color: Colors.purple,
+                  height: 100,
+                  width: 100,
+                ),
+              );
+            }),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          counterBloc.add(CounterIncrementEvent());
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              context.read<CounterBloc>().add(CounterIncrementEvent());
+            },
+            tooltip: 'Increment',
+            child: const Icon(Icons.add),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              context.read<CounterBloc>().add(CounterDecrementEvent());
+            },
+            tooltip: 'Decrement',
+            child: const Icon(Icons.remove),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              context.read<VisibilityBloc>().add(VisibilityShowEvent());
+            },
+            child: const Text("Show"),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              context.read<VisibilityBloc>().add(VisibilityHideEvent());
+            },
+            child: const Text("Hide"),
+          ),
+        ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
