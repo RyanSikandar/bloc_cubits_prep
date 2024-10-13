@@ -111,12 +111,17 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'You have pushed the button this many times:',
             ),
-            BlocBuilder<CounterBloc, CounterState>(
-                buildWhen: (previous, current) {
-              print('previous: ${previous.count}');
-              print('current: ${current.count}');
-              return previous.count != current.count;
-            }, //Optional if you want to use the default counterBloc otherwise you can use BlocProvider.of<CounterBloc>(context). using this is of local scope.
+            BlocConsumer<CounterBloc, CounterState>(listener: (context, state) {
+              state.count == 3
+                  ? ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text("Count is 3")))
+                  : null;
+            },
+                //     buildWhen: (previous, current) {
+                //   print('previous: ${previous.count}');
+                //   print('current: ${current.count}');
+                //   return previous.count != current.count;
+                // }, //Optional if you want to use the default counterBloc otherwise you can use BlocProvider.of<CounterBloc>(context). using this is of local scope.
                 builder: (context, state) {
               return Text(
                 state.count.toString(),
@@ -134,6 +139,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             }),
+            // BlocListener<CounterBloc, CounterState>(
+            //   listenWhen: (previous, current) => current.count == 3,
+            //   listener: (context, state) {
+            //     state.count == 3
+            //         ? ScaffoldMessenger.of(context)
+            //             .showSnackBar(SnackBar(content: Text("Count is 3")))
+            //         : null;
+            //   },
+            //   child: const Text("Bloc Listener"),
+            // )
           ],
         ),
       ),
