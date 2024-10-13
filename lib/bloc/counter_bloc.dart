@@ -20,5 +20,29 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
     on<CounterDecrementEvent>(
         (event, emit) => emit(CounterState(count: state.count - 1)));
   }
+  @override
+  void onChange(Change<CounterState> change) {
+    //always called when the state is changed.
+    super.onChange(change);
+    print(change.currentState.count.toString());
+    print(change.nextState.count.toString());
+  }
+
+  @override //always called when the new state is emitted and the state is changed from the previous state. before the bloc is updated.
+  void onTransition(Transition<CounterEvent, CounterState> transition) {
+    super.onTransition(transition);
+    print(transition.toString());
+  }
+
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    super.onError(error, stackTrace);
+    print(error);
+  }
+
+  @override
+  void onEvent(CounterEvent event) {
+    super.onEvent(event);
+    print(event.toString());
+  }
 }
-  

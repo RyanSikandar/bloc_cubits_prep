@@ -139,6 +139,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               );
             }),
+            BlocSelector<CounterBloc, CounterState, bool>(
+                selector: (state) => state.count % 2 == 0,
+                builder: (context, isEven) {
+                  return Text(isEven ? "Even" : "Odd");
+                })
             // BlocListener<CounterBloc, CounterState>(
             //   listenWhen: (previous, current) => current.count == 3,
             //   listener: (context, state) {
